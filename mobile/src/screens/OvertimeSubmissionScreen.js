@@ -1,7 +1,7 @@
 import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 
-export default function LeaveSubmissionScreen({ navigation }) {
+export default function OvertimeSubmissionScreen({ navigation }) {
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -18,35 +18,26 @@ export default function LeaveSubmissionScreen({ navigation }) {
             </View>
             <View style={styles.absoluteContainer}>
                 <View style={styles.titleContainer}>
-                    <Text style={styles.title}>Leave Submission</Text>
-                </View>
-                <View style={styles.infoCardHeader}>
-                    <View style={styles.infoCardContentHeader}>
-                        <Text style={styles.infoCardTextHeader}>
-                            Remaining Leave: 5
-                        </Text>
-                    </View>
+                    <Text style={styles.title}>Overtime Submission</Text>
                 </View>
             </View>
             <View style={styles.buttonPlace}>
                 <TouchableOpacity style={styles.button} activeOpacity={0.6}>
-                    <Text style={styles.buttonText}>Add Leave</Text>
+                    <Text style={styles.buttonText}>Add Overtime</Text>
                 </TouchableOpacity>
             </View>
             <View style={styles.infoCard}>
                 <View style={styles.infoCardContent}>
-                    <Text style={styles.infoCardText}>Reason Leave:</Text>
-                    <Text style={styles.infoCardText}>From:</Text>
-                    <Text style={styles.infoCardText}>To:</Text>
-                    <Text style={styles.infoCardText}>Leave Status:</Text>
+                    <Text style={styles.infoCardText}>Reason Overtime:</Text>
+                    <Text style={styles.infoCardText}>Duration Overtime:</Text>
+                    <Text style={styles.infoCardText}>Overtime Status:</Text>
                 </View>
             </View>
             <View style={styles.infoCard}>
                 <View style={styles.infoCardContent}>
-                    <Text style={styles.infoCardText}>Reason Leave:</Text>
-                    <Text style={styles.infoCardText}>From:</Text>
-                    <Text style={styles.infoCardText}>To:</Text>
-                    <Text style={styles.infoCardText}>Leave Status:</Text>
+                    <Text style={styles.infoCardText}>Reason Overtime:</Text>
+                    <Text style={styles.infoCardText}>Duration Overtime:</Text>
+                    <Text style={styles.infoCardText}>Overtime Status:</Text>
                 </View>
             </View>
         </View>
@@ -59,7 +50,7 @@ const styles = StyleSheet.create({
     },
     header: {
         width: '100%',
-        height: 180,
+        height: 150,
         backgroundColor: 'red',
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
@@ -122,7 +113,7 @@ const styles = StyleSheet.create({
     },
     infoCard: {
         width: '93%',
-        height: 140,
+        height: 114,
         marginTop: 10,
         backgroundColor: 'black',
         alignSelf: 'center',

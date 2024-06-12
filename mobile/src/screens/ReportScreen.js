@@ -12,7 +12,11 @@ export default function ReportScreen() {
                     <Text style={styles.title}>Report</Text>
                 </View>
             </View>
-            <TouchableOpacity style={styles.infoCard} activeOpacity={0.6}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('OvertimeSubmission')}
+                style={styles.infoCard}
+                activeOpacity={0.6}
+            >
                 <View style={styles.infoCardContent}>
                     <Text style={styles.infoCardText}>Overtime Submission</Text>
                 </View>
