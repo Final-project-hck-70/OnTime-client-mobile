@@ -26,9 +26,9 @@ export default function HomeTab() {
                     tabBarShowLabel: false,
                     tabBarIcon: ({ focused }) =>
                         focused ? (
-                            <Entypo name="home" size={28} color="black" />
+                            <Entypo name="home" size={32} color="black" />
                         ) : (
-                            <AntDesign name="home" size={28} color="black" />
+                            <AntDesign name="home" size={30} color="black" />
                         ),
                 }}
             />

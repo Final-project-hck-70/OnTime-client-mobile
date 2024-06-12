@@ -1,6 +1,9 @@
+import { useNavigation } from '@react-navigation/native'
 import { Text, View, StyleSheet, TouchableOpacity } from 'react-native'
 
 export default function ReportScreen() {
+    const navigation = useNavigation()
+
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
@@ -14,7 +17,11 @@ export default function ReportScreen() {
                     <Text style={styles.infoCardText}>Overtime Submission</Text>
                 </View>
             </TouchableOpacity>
-            <TouchableOpacity style={styles.infoCard} activeOpacity={0.6}>
+            <TouchableOpacity
+                onPress={() => navigation.navigate('LeaveSubmission')}
+                style={styles.infoCard}
+                activeOpacity={0.6}
+            >
                 <View style={styles.infoCardContent}>
                     <Text style={styles.infoCardText}>Leave Submission</Text>
                 </View>
