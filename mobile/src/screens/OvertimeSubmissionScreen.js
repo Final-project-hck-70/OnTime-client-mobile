@@ -22,7 +22,11 @@ export default function OvertimeSubmissionScreen({ navigation }) {
                 </View>
             </View>
             <View style={styles.buttonPlace}>
-                <TouchableOpacity style={styles.button} activeOpacity={0.6}>
+                <TouchableOpacity
+                    onPress={() => navigation.navigate('FormOvertime')}
+                    style={styles.button}
+                    activeOpacity={0.6}
+                >
                     <Text style={styles.buttonText}>Add Overtime</Text>
                 </TouchableOpacity>
             </View>
