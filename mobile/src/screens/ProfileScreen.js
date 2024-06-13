@@ -12,8 +12,22 @@ import {
     FontAwesome,
     MaterialCommunityIcons,
 } from '@expo/vector-icons'
+import { useContext, useEffect } from 'react'
+import { AuthContext } from '../config/authContext'
+import { deleteKey } from '../helpers/secureStore'
 
 export default function ProfileScreen() {
+    const { setIsSignedIn, isSignedIn } = useContext(AuthContext)
+
+    async function handleLogout() {
+        try {
+            await deleteKey('token')
+            setIsSignedIn(false)
+        } catch (error) {
+            console.log(error)
+        }
+    }
+
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.safeArea}>
@@ -82,6 +96,7 @@ export default function ProfileScreen() {
                     <TouchableOpacity
                         style={styles.buttonSection}
                         activeOpacity={0.9}
+                        onPress={handleLogout}
                     >
                         <View style={styles.buttonArea}>
                             <MaterialCommunityIcons

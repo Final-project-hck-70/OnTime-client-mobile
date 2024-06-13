@@ -6,10 +6,45 @@ import {
     KeyboardAvoidingView,
     TextInput,
     Pressable,
+    Alert,
 } from 'react-native'
 import { MaterialIcons, Entypo } from '@expo/vector-icons'
+import { useContext, useState } from 'react'
+import { AuthContext } from '../config/authContext'
+import { save } from '../helpers/secureStore'
 
-export default function LoginScreen({ navigation }) {
+export default function LoginScreen() {
+    const [email, setEmail] = useState('')
+    const [password, setPassword] = useState('')
+    const { setIsSignedIn } = useContext(AuthContext)
+
+    const handleLogin = async () => {
+        try {
+            const response = await fetch(
+                'https://7e8d-139-228-111-126.ngrok-free.app/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                }
+            )
+
+            const data = await response.json()
+
+            if (response.status === 200) {
+                await save('token', JSON.stringify(data.token))
+                setIsSignedIn(true)
+            } else {
+                Alert.alert('Error', data.message)
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            Alert.alert('Error', 'Something went wrong')
+        }
+    }
+
     return (
         <SafeAreaView style={styles.container}>
             <View>
@@ -32,6 +67,8 @@ export default function LoginScreen({ navigation }) {
                         <TextInput
                             style={styles.input}
                             placeholder="Enter Your Email"
+                            value={email}
+                            onChangeText={setEmail}
                         />
                     </View>
 
@@ -46,6 +83,8 @@ export default function LoginScreen({ navigation }) {
                             secureTextEntry={true}
                             style={styles.input}
                             placeholder="Enter Your Password"
+                            value={password}
+                            onChangeText={setPassword}
                         />
                     </View>
 
@@ -56,10 +95,7 @@ export default function LoginScreen({ navigation }) {
                         </Text>
                     </View>
 
-                    <Pressable
-                        onPress={() => navigation.navigate('MainPage')}
-                        style={styles.loginButton}
-                    >
+                    <Pressable onPress={handleLogin} style={styles.loginButton}>
                         <Text style={styles.loginButtonText}>Login</Text>
                     </Pressable>
                 </View>
