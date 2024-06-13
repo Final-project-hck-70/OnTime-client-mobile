@@ -1,7 +1,10 @@
+import { useNavigation } from '@react-navigation/native'
 import React from 'react'
 import { Text, View, Image, StyleSheet, TouchableOpacity } from 'react-native'
 
 export default function HomeScreen() {
+    const navigation = useNavigation()
+
     return (
         <View style={styles.container}>
             <View style={styles.header}></View>
@@ -40,11 +43,21 @@ export default function HomeScreen() {
                     </TouchableOpacity>
                 </View>
                 <View style={styles.buttonRow}>
-                    <TouchableOpacity style={styles.button} activeOpacity={0.6}>
+                    <TouchableOpacity
+                        onPress={() =>
+                            navigation.navigate('OvertimeSubmission')
+                        }
+                        style={styles.button}
+                        activeOpacity={0.6}
+                    >
                         <Text style={styles.buttonText}>Overtime</Text>
                         <Text style={styles.buttonText}>Submission</Text>
                     </TouchableOpacity>
-                    <TouchableOpacity style={styles.button} activeOpacity={0.6}>
+                    <TouchableOpacity
+                        onPress={() => navigation.navigate('LeaveSubmission')}
+                        style={styles.button}
+                        activeOpacity={0.6}
+                    >
                         <Text style={styles.buttonText}>Leave</Text>
                         <Text style={styles.buttonText}>Submission</Text>
                     </TouchableOpacity>

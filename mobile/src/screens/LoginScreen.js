@@ -1,0 +1,140 @@
+import {
+    StyleSheet,
+    SafeAreaView,
+    View,
+    Text,
+    KeyboardAvoidingView,
+    TextInput,
+    Pressable,
+} from 'react-native'
+import { MaterialIcons, Entypo } from '@expo/vector-icons'
+
+export default function LoginScreen({ navigation }) {
+    return (
+        <SafeAreaView style={styles.container}>
+            <View>
+                <Text style={styles.titleLogo}>OnTime</Text>
+            </View>
+
+            <KeyboardAvoidingView>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>Log In To Your Account</Text>
+                </View>
+
+                <View>
+                    <View style={styles.inputContainer}>
+                        <MaterialIcons
+                            style={styles.icon}
+                            name="email"
+                            size={24}
+                            color="black"
+                        />
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Enter Your Email"
+                        />
+                    </View>
+
+                    <View style={styles.inputContainer}>
+                        <Entypo
+                            style={styles.icon}
+                            name="lock"
+                            size={24}
+                            color="black"
+                        />
+                        <TextInput
+                            secureTextEntry={true}
+                            style={styles.input}
+                            placeholder="Enter Your Password"
+                        />
+                    </View>
+
+                    <View style={styles.optionsContainer}>
+                        <Text>Keep me logged in</Text>
+                        <Text style={styles.forgotPassword}>
+                            Forgot Password?
+                        </Text>
+                    </View>
+
+                    <Pressable
+                        onPress={() => navigation.navigate('MainPage')}
+                        style={styles.loginButton}
+                    >
+                        <Text style={styles.loginButtonText}>Login</Text>
+                    </Pressable>
+                </View>
+            </KeyboardAvoidingView>
+        </SafeAreaView>
+    )
+}
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        backgroundColor: 'white',
+        alignItems: 'center',
+        justifyContent: 'center',
+    },
+    titleLogo: {
+        fontSize: 50,
+        fontWeight: '900',
+        marginBottom: 20,
+    },
+    titleContainer: {
+        alignItems: 'center',
+    },
+    title: {
+        fontSize: 17,
+        fontWeight: 'bold',
+    },
+    inputContainer: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 5,
+        backgroundColor: '#E0E0E0',
+        paddingVertical: 5,
+        borderRadius: 5,
+        marginTop: 30,
+    },
+    icon: {
+        marginLeft: 8,
+    },
+    input: {
+        marginVertical: 10,
+        width: 300,
+        color: 'gray',
+    },
+    optionsContainer: {
+        marginTop: 12,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+    },
+    forgotPassword: {
+        color: 'red',
+        fontWeight: '500',
+    },
+    loginButton: {
+        width: 200,
+        backgroundColor: 'red',
+        borderRadius: 6,
+        marginLeft: 'auto',
+        marginRight: 'auto',
+        padding: 15,
+        marginTop: 30,
+    },
+    loginButtonText: {
+        textAlign: 'center',
+        color: 'white',
+        fontSize: 16,
+        fontWeight: 'bold',
+    },
+    registerButton: {
+        marginTop: 15,
+    },
+    registerButtonText: {
+        textAlign: 'center',
+        color: 'gray',
+        fontSize: 16,
+    },
+})
