@@ -6,8 +6,53 @@ import {
     View,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import DateTimePicker from '@react-native-community/datetimepicker'
+import { useState } from 'react'
 
 export default function FormLeaveScreen({ navigation }) {
+    const [date, setDate] = useState(new Date())
+    const [toDate, setToDate] = useState(new Date())
+    const [show, setShow] = useState(false)
+    const [showTo, setShowTo] = useState(false)
+    const [mode, setMode] = useState('date')
+    const [fromDateText, setFromDateText] = useState('From')
+    const [toDateText, setToDateText] = useState('To')
+
+    const onChangeFrom = (e, selectedDate) => {
+        const currentDate = selectedDate || date
+        setShow(false)
+        setDate(currentDate)
+        setFromDateText(formatDate(currentDate))
+    }
+
+    const onChangeTo = (e, selectedDate) => {
+        const currentDate = selectedDate || toDate
+        setShowTo(false)
+        setToDate(currentDate)
+        setToDateText(formatDate(currentDate))
+    }
+
+    const showMode = (modeToShow) => {
+        setShow(true)
+        setMode(modeToShow)
+    }
+
+    const showToMode = (modeToShow) => {
+        setShowTo(true)
+        setMode(modeToShow)
+    }
+
+    const formatDate = (date) => {
+        let day = date.getDate()
+        let month = date.getMonth() + 1
+        let year = date.getFullYear()
+
+        if (day < 10) day = `0${day}`
+        if (month < 10) month = `0${month}`
+
+        return `${day}/${month}/${year}`
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -28,23 +73,39 @@ export default function FormLeaveScreen({ navigation }) {
                 </View>
             </View>
             <View style={styles.inputBox}>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="From"
-                        placeholderTextColor="white"
-                    />
-                </View>
+                <TouchableOpacity
+                    onPress={() => showMode('date')}
+                    style={styles.inputContainer2}
+                    activeOpacity={0.6}
+                >
+                    <Text style={styles.input}>{fromDateText}</Text>
+                </TouchableOpacity>
             </View>
+            {show && (
+                <DateTimePicker
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    onChange={onChangeFrom}
+                />
+            )}
             <View style={styles.inputBox}>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="To"
-                        placeholderTextColor="white"
-                    />
-                </View>
+                <TouchableOpacity
+                    onPress={() => showToMode('date')}
+                    style={styles.inputContainer2}
+                    activeOpacity={0.6}
+                >
+                    <Text style={styles.input}>{toDateText}</Text>
+                </TouchableOpacity>
             </View>
+            {showTo && (
+                <DateTimePicker
+                    value={toDate}
+                    mode={mode}
+                    is24Hour={true}
+                    onChange={onChangeTo}
+                />
+            )}
             <View style={styles.inputBox}>
                 <View style={styles.inputContainer}>
                     <TextInput
@@ -60,6 +121,7 @@ export default function FormLeaveScreen({ navigation }) {
                         style={styles.input}
                         placeholder="Number of Days"
                         placeholderTextColor="white"
+                        keyboardType="numeric"
                     />
                 </View>
             </View>
@@ -114,6 +176,13 @@ const styles = StyleSheet.create({
     inputBox: {
         paddingLeft: 13,
         paddingRight: 13,
+    },
+    inputContainer2: {
+        flexDirection: 'row',
+        backgroundColor: 'black',
+        paddingVertical: 9,
+        borderRadius: 15,
+        marginTop: 10,
     },
     inputContainer: {
         flexDirection: 'row',

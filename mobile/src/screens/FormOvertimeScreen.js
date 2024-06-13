@@ -6,8 +6,38 @@ import {
     View,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import { useState } from 'react'
+import DateTimePicker from '@react-native-community/datetimepicker'
 
 export default function FormOvertimeScreen({ navigation }) {
+    const [date, setDate] = useState(new Date())
+    const [show, setShow] = useState(false)
+    const [mode, setMode] = useState('date')
+    const [overtimeDateText, setOvertimeDateText] = useState('Overtime Date')
+
+    const onChangeOvertime = (e, selectedDate) => {
+        const currentDate = selectedDate || date
+        setShow(false)
+        setDate(currentDate)
+        setOvertimeDateText(formatDate(currentDate))
+    }
+
+    const showMode = (modeToShow) => {
+        setShow(true)
+        setMode(modeToShow)
+    }
+
+    const formatDate = (date) => {
+        let day = date.getDate()
+        let month = date.getMonth() + 1
+        let year = date.getFullYear()
+
+        if (day < 10) day = `0${day}`
+        if (month < 10) month = `0${month}`
+
+        return `${day}/${month}/${year}`
+    }
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -28,20 +58,29 @@ export default function FormOvertimeScreen({ navigation }) {
                 </View>
             </View>
             <View style={styles.inputBox}>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Overtime Date"
-                        placeholderTextColor="white"
-                    />
-                </View>
+                <TouchableOpacity
+                    onPress={() => showMode('date')}
+                    style={styles.inputContainer2}
+                    activeOpacity={0.6}
+                >
+                    <Text style={styles.input}>{overtimeDateText}</Text>
+                </TouchableOpacity>
             </View>
+            {show && (
+                <DateTimePicker
+                    value={date}
+                    mode={mode}
+                    is24Hour={true}
+                    onChange={onChangeOvertime}
+                />
+            )}
             <View style={styles.inputBox}>
                 <View style={styles.inputContainer}>
                     <TextInput
                         style={styles.input}
                         placeholder="Overtime Duration"
                         placeholderTextColor="white"
+                        keyboardType="numeric"
                     />
                 </View>
             </View>
@@ -96,6 +135,13 @@ const styles = StyleSheet.create({
     inputBox: {
         paddingLeft: 13,
         paddingRight: 13,
+    },
+    inputContainer2: {
+        flexDirection: 'row',
+        backgroundColor: 'black',
+        paddingVertical: 9,
+        borderRadius: 15,
+        marginTop: 10,
     },
     inputContainer: {
         flexDirection: 'row',

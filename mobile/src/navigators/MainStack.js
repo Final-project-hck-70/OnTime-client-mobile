@@ -4,12 +4,18 @@ import LeaveSubmissionScreen from '../screens/LeaveSubmissionScreen'
 import OvertimeSubmissionScreen from '../screens/OvertimeSubmissionScreen'
 import FormLeaveScreen from '../screens/FormLeaveScreen'
 import FormOvertimeScreen from '../screens/FormOvertimeScreen'
+import LoginScreen from '../screens/LoginScreen'
 
 const Stack = createNativeStackNavigator()
 
 export default function MainStack() {
     return (
         <Stack.Navigator>
+            <Stack.Screen
+                name="Login"
+                component={LoginScreen}
+                options={{ headerShown: false }}
+            />
             <Stack.Screen
                 name="MainPage"
                 component={HomeTab}

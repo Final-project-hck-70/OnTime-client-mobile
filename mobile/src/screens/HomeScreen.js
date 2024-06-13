@@ -44,7 +44,9 @@ export default function HomeScreen() {
                 </View>
                 <View style={styles.buttonRow}>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('FormOvertime')}
+                        onPress={() =>
+                            navigation.navigate('OvertimeSubmission')
+                        }
                         style={styles.button}
                         activeOpacity={0.6}
                     >
@@ -52,7 +54,7 @@ export default function HomeScreen() {
                         <Text style={styles.buttonText}>Submission</Text>
                     </TouchableOpacity>
                     <TouchableOpacity
-                        onPress={() => navigation.navigate('FormLeave')}
+                        onPress={() => navigation.navigate('LeaveSubmission')}
                         style={styles.button}
                         activeOpacity={0.6}
                     >
