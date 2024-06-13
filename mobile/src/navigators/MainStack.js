@@ -5,42 +5,51 @@ import OvertimeSubmissionScreen from '../screens/OvertimeSubmissionScreen'
 import FormLeaveScreen from '../screens/FormLeaveScreen'
 import FormOvertimeScreen from '../screens/FormOvertimeScreen'
 import LoginScreen from '../screens/LoginScreen'
+import { useContext } from 'react'
+import { AuthContext } from '../config/authContext'
 
 const Stack = createNativeStackNavigator()
 
 export default function MainStack() {
+    const { isSignedIn } = useContext(AuthContext)
+
     return (
         <Stack.Navigator>
-            <Stack.Screen
-                name="Login"
-                component={LoginScreen}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="MainPage"
-                component={HomeTab}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="LeaveSubmission"
-                component={LeaveSubmissionScreen}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="OvertimeSubmission"
-                component={OvertimeSubmissionScreen}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="FormLeave"
-                component={FormLeaveScreen}
-                options={{ headerShown: false }}
-            />
-            <Stack.Screen
-                name="FormOvertime"
-                component={FormOvertimeScreen}
-                options={{ headerShown: false }}
-            />
+            {isSignedIn ? (
+                <>
+                    <Stack.Screen
+                        name="MainPage"
+                        component={HomeTab}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="LeaveSubmission"
+                        component={LeaveSubmissionScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="OvertimeSubmission"
+                        component={OvertimeSubmissionScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormLeave"
+                        component={FormLeaveScreen}
+                        options={{ headerShown: false }}
+                    />
+                    <Stack.Screen
+                        name="FormOvertime"
+                        component={FormOvertimeScreen}
+                        options={{ headerShown: false }}
+                    />
+                </>
+            ) : (
+                <Stack.Screen
+                    name="Login"
+                    component={LoginScreen}
+                    options={{ headerShown: false }}
+                />
+            )}
         </Stack.Navigator>
     )
 }
