@@ -1,19 +1,23 @@
+import React, { useState } from 'react'
 import {
     StyleSheet,
     Text,
     TextInput,
     TouchableOpacity,
     View,
+    Alert,
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
-import { useState } from 'react'
 import DateTimePicker from '@react-native-community/datetimepicker'
+import { save, getValueFor } from '../helpers/secureStore'
 
 export default function FormOvertimeScreen({ navigation }) {
     const [date, setDate] = useState(new Date())
     const [show, setShow] = useState(false)
     const [mode, setMode] = useState('date')
     const [overtimeDateText, setOvertimeDateText] = useState('Overtime Date')
+    const [overtimeDuration, setOvertimeDuration] = useState('')
+    const [overtimeReason, setOvertimeReason] = useState('')
 
     const onChangeOvertime = (e, selectedDate) => {
         const currentDate = selectedDate || date
@@ -35,16 +39,61 @@ export default function FormOvertimeScreen({ navigation }) {
         if (day < 10) day = `0${day}`
         if (month < 10) month = `0${month}`
 
-        return `${day}/${month}/${year}`
+        return `${year}/${month}/${day}`
+    }
+
+    const handleSubmit = async () => {
+        try {
+            const token = await getValueFor('token')
+            if (!token) {
+                Alert.alert('Error', 'User not authenticated')
+                return
+            }
+
+            const response = await fetch(
+                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/overtimes',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        overtimeDate: date.toISOString().split('T')[0],
+                        overtimeDuration,
+                        overtimeReason,
+                    }),
+                }
+            )
+
+            const data = await response.json()
+
+            if (response.status === 201) {
+                Alert.alert(
+                    'Success',
+                    'Overtime submisssion created successfully',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () =>
+                                navigation.navigate('OvertimeSubmission'),
+                        },
+                    ]
+                )
+            } else {
+                Alert.alert('Error', data.message || 'Something went wrong')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            Alert.alert('Error', 'Something went wrong')
+        }
     }
 
     return (
         <View style={styles.container}>
             <View style={styles.header}>
                 <Ionicons
-                    onPress={() => {
-                        navigation.navigate('OvertimeSubmission')
-                    }}
+                    onPress={() => navigation.navigate('OvertimeSubmission')}
                     name="chevron-back"
                     size={30}
                     color="white"
@@ -81,6 +130,8 @@ export default function FormOvertimeScreen({ navigation }) {
                         placeholder="Overtime Duration"
                         placeholderTextColor="white"
                         keyboardType="numeric"
+                        value={overtimeDuration}
+                        onChangeText={setOvertimeDuration}
                     />
                 </View>
             </View>
@@ -93,11 +144,17 @@ export default function FormOvertimeScreen({ navigation }) {
                         multiline={true}
                         numberOfLines={5}
                         textAlignVertical="top"
+                        value={overtimeReason}
+                        onChangeText={setOvertimeReason}
                     />
                 </View>
             </View>
             <View style={styles.buttonPlace}>
-                <TouchableOpacity style={styles.button} activeOpacity={0.6}>
+                <TouchableOpacity
+                    style={styles.button}
+                    activeOpacity={0.6}
+                    onPress={handleSubmit}
+                >
                     <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>
             </View>

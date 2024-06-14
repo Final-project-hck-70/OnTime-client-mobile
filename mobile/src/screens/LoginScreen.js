@@ -21,7 +21,7 @@ export default function LoginScreen() {
     const handleLogin = async () => {
         try {
             const response = await fetch(
-                'https://7e8d-139-228-111-126.ngrok-free.app/login',
+                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/login',
                 {
                     method: 'POST',
                     headers: {
@@ -34,7 +34,7 @@ export default function LoginScreen() {
             const data = await response.json()
 
             if (response.status === 200) {
-                await save('token', JSON.stringify(data.token))
+                await save('token', data.token)
                 setIsSignedIn(true)
             } else {
                 Alert.alert('Error', data.message)

@@ -1,10 +1,91 @@
-import React, { useState } from 'react'
-import { Text, View, StyleSheet, ScrollView } from 'react-native'
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native'
 import { Picker } from '@react-native-picker/picker'
+import { getValueFor } from '../helpers/secureStore'
+import CardAttendance from '../components/CardAttendance'
 
 export default function HistoryScreen() {
     const [selectedMonth, setSelectedMonth] = useState('')
     const [selectedYear, setSelectedYear] = useState('')
+    const [attendanceData, setAttendanceData] = useState([])
+    const [filteredAttendanceData, setFilteredAttendanceData] = useState([])
+    const [lateCount, setLateCount] = useState(0)
+
+    const fetchUserData = async () => {
+        try {
+            const token = await getValueFor('token')
+            if (!token) {
+                Alert.alert('Error', 'User not authenticated')
+                return
+            }
+
+            const response = await fetch(
+                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/users/profile/me',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
+            const data = await response.json()
+
+            if (response.status !== 200) {
+                throw new Error(data.message || 'Failed to fetch user data')
+            }
+
+            setAttendanceData(data.Attendances || [])
+        } catch (error) {
+            console.log('Error fetching user data', error)
+            Alert.alert('Error', 'Failed to fetch user data')
+        }
+    }
+
+    useEffect(() => {
+        fetchUserData()
+    }, [])
+
+    useEffect(() => {
+        filterAttendanceData()
+    }, [selectedMonth, selectedYear, attendanceData])
+
+    const filterAttendanceData = () => {
+        const monthNames = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
+        ]
+
+        const monthIndex = monthNames.indexOf(selectedMonth) + 1
+        let lateCountTemp = 0
+        const filteredData = attendanceData.filter((attendance) => {
+            const attendanceDate = new Date(attendance.createdAt)
+            const attendanceMonth = attendanceDate.getMonth() + 1
+            const attendanceYear = attendanceDate.getFullYear()
+            const isMatching =
+                (selectedMonth === '' || attendanceMonth === monthIndex) &&
+                (selectedYear === '' ||
+                    attendanceYear === parseInt(selectedYear))
+
+            if (isMatching && attendance.attendanceStatus === 'late') {
+                lateCountTemp += 1
+            }
+
+            return isMatching
+        })
+
+        setLateCount(lateCountTemp)
+        setFilteredAttendanceData(filteredData)
+    }
 
     return (
         <View style={styles.container}>
@@ -16,20 +97,9 @@ export default function HistoryScreen() {
                 <View style={styles.infoCardHeader}>
                     <View style={styles.infoCardContentHeader}>
                         <Text style={styles.infoCardTextHeader}>
-                            Absence Total:
+                            Late Clock In: {lateCount}
                         </Text>
-                        <Text style={styles.infoCardTextHeader}>
-                            Late Clock In:
-                        </Text>
-                        <Text style={styles.infoCardTextHeader}>
-                            Late Clock Out:
-                        </Text>
-                        <Text style={styles.infoCardTextHeader}>
-                            No Clock In:
-                        </Text>
-                        <Text style={styles.infoCardTextHeader}>
-                            No Clock Out:
-                        </Text>
+                        <Text style={styles.infoCardTextHeader}>Absent:</Text>
                     </View>
                 </View>
             </View>
@@ -78,40 +148,14 @@ export default function HistoryScreen() {
                     </Picker>
                 </View>
             </View>
-            <Text style={styles.textList}>List History of Attendence</Text>
+            <Text style={styles.textList}>List History of Attendance</Text>
             <ScrollView>
-                <View style={styles.infoCard}>
-                    <View style={styles.infoCardContent}>
-                        <Text style={styles.infoCardText}>Date:</Text>
-                        <Text style={styles.infoCardText}>Clock In:</Text>
-                        <Text style={styles.infoCardText}>Clock Out:</Text>
-                        <Text style={styles.infoCardText}>Absence Status:</Text>
-                    </View>
-                </View>
-                <View style={styles.infoCard}>
-                    <View style={styles.infoCardContent}>
-                        <Text style={styles.infoCardText}>Date:</Text>
-                        <Text style={styles.infoCardText}>Clock In:</Text>
-                        <Text style={styles.infoCardText}>Clock Out:</Text>
-                        <Text style={styles.infoCardText}>Absence Status:</Text>
-                    </View>
-                </View>
-                <View style={styles.infoCard}>
-                    <View style={styles.infoCardContent}>
-                        <Text style={styles.infoCardText}>Date:</Text>
-                        <Text style={styles.infoCardText}>Clock In:</Text>
-                        <Text style={styles.infoCardText}>Clock Out:</Text>
-                        <Text style={styles.infoCardText}>Absence Status:</Text>
-                    </View>
-                </View>
-                <View style={styles.infoCard2}>
-                    <View style={styles.infoCardContent}>
-                        <Text style={styles.infoCardText}>Date:</Text>
-                        <Text style={styles.infoCardText}>Clock In:</Text>
-                        <Text style={styles.infoCardText}>Clock Out:</Text>
-                        <Text style={styles.infoCardText}>Absence Status:</Text>
-                    </View>
-                </View>
+                {filteredAttendanceData.map((attendance) => (
+                    <CardAttendance
+                        key={attendance.id}
+                        attendance={attendance}
+                    />
+                ))}
             </ScrollView>
         </View>
     )
@@ -123,7 +167,7 @@ const styles = StyleSheet.create({
     },
     header: {
         width: '100%',
-        height: 260,
+        height: 205,
         backgroundColor: 'red',
         borderBottomLeftRadius: 30,
         borderBottomRightRadius: 30,
@@ -146,7 +190,7 @@ const styles = StyleSheet.create({
     },
     infoCardHeader: {
         width: '90%',
-        height: 120,
+        height: 65,
         marginTop: 20,
         backgroundColor: '#f2f2f2',
         alignSelf: 'center',
@@ -187,34 +231,5 @@ const styles = StyleSheet.create({
         alignSelf: 'center',
         marginTop: 20,
         marginBottom: 10,
-    },
-    infoCard: {
-        width: '93%',
-        height: 140,
-        marginTop: 10,
-        backgroundColor: 'black',
-        alignSelf: 'center',
-        borderRadius: 20,
-    },
-    infoCard2: {
-        width: '93%',
-        height: 140,
-        marginTop: 10,
-        marginBottom: 10,
-        backgroundColor: 'black',
-        alignSelf: 'center',
-        borderRadius: 20,
-    },
-    infoCardContent: {
-        width: '90%',
-        marginTop: 20,
-        gap: 5,
-        justifyContent: 'space-between',
-        marginLeft: 20,
-    },
-    infoCardText: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: 'white',
     },
 })

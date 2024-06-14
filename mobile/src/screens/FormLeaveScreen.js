@@ -1,4 +1,5 @@
 import {
+    Alert,
     StyleSheet,
     Text,
     TextInput,
@@ -7,7 +8,8 @@ import {
 } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
+import { getValueFor } from '../helpers/secureStore'
 
 export default function FormLeaveScreen({ navigation }) {
     const [date, setDate] = useState(new Date())
@@ -17,6 +19,36 @@ export default function FormLeaveScreen({ navigation }) {
     const [mode, setMode] = useState('date')
     const [fromDateText, setFromDateText] = useState('From')
     const [toDateText, setToDateText] = useState('To')
+    const [delegateTo, setDelegateTo] = useState('')
+    const [leaveReason, setLeaveReason] = useState('')
+    const [userList, setUserList] = useState([])
+
+    useEffect(() => {
+        const fetchUsers = async () => {
+            try {
+                const token = await getValueFor('token')
+                if (!token) {
+                    Alert.alert('Error, User not authenticated')
+                    return
+                }
+                const response = await fetch(
+                    'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/users',
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                )
+                const data = await response.json()
+                setUserList(data)
+            } catch (error) {
+                console.log('Error fetching user list', error)
+                Alert.alert('Error', 'Failed to fetch user list')
+            }
+        }
+
+        fetchUsers()
+    }, [])
 
     const onChangeFrom = (e, selectedDate) => {
         const currentDate = selectedDate || date
@@ -50,7 +82,65 @@ export default function FormLeaveScreen({ navigation }) {
         if (day < 10) day = `0${day}`
         if (month < 10) month = `0${month}`
 
-        return `${day}/${month}/${year}`
+        return `${year}/${month}/${day}`
+    }
+
+    const handleSubmit = async () => {
+        try {
+            const token = await getValueFor('token')
+            if (!token) {
+                Alert.alert('Error, User not authenticated')
+                return
+            }
+
+            const delegateUser = userList.find(
+                (user) => user.name === delegateTo
+            )
+            const DelegateUserId = delegateUser ? delegateUser.id : null
+
+            if (!DelegateUserId) {
+                Alert.alert('Error', 'Delegate user not found')
+                return
+            }
+
+            const response = await fetch(
+                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/leaves',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        from: date.toISOString().split('T')[0],
+                        to: toDate.toISOString().split('T')[0],
+                        reason: leaveReason,
+                        DelegateUserId,
+                    }),
+                }
+            )
+
+            const data = await response.json()
+
+            if (response.status === 201) {
+                Alert.alert(
+                    'Success',
+                    'Leave submission created successfully',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () =>
+                                navigation.navigate('LeaveSubmission'),
+                        },
+                    ]
+                )
+            } else {
+                Alert.alert('Error', data.message || 'Something went wrong')
+            }
+        } catch (error) {
+            console.log('Error', error)
+            Alert.alert('Error', 'Something went wrong')
+        }
     }
 
     return (
@@ -112,16 +202,8 @@ export default function FormLeaveScreen({ navigation }) {
                         style={styles.input}
                         placeholder="Delegate To"
                         placeholderTextColor="white"
-                    />
-                </View>
-            </View>
-            <View style={styles.inputBox}>
-                <View style={styles.inputContainer}>
-                    <TextInput
-                        style={styles.input}
-                        placeholder="Number of Days"
-                        placeholderTextColor="white"
-                        keyboardType="numeric"
+                        value={delegateTo}
+                        onChangeText={setDelegateTo}
                     />
                 </View>
             </View>
@@ -134,11 +216,17 @@ export default function FormLeaveScreen({ navigation }) {
                         multiline={true}
                         numberOfLines={5}
                         textAlignVertical="top"
+                        value={leaveReason}
+                        onChangeText={setLeaveReason}
                     />
                 </View>
             </View>
             <View style={styles.buttonPlace}>
-                <TouchableOpacity style={styles.button} activeOpacity={0.6}>
+                <TouchableOpacity
+                    style={styles.button}
+                    activeOpacity={0.6}
+                    onPress={handleSubmit}
+                >
                     <Text style={styles.buttonText}>Submit</Text>
                 </TouchableOpacity>
             </View>
