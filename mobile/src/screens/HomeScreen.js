@@ -13,7 +13,6 @@ import { getValueFor } from "../helpers/secureStore";
 const formatTodayDate = () => {
   const today = new Date();
 
-  // Format tanggal menjadi "16 Juni 2024"
   const formattedDate = new Intl.DateTimeFormat("id-ID", {
     day: "2-digit",
     month: "long",
@@ -23,10 +22,8 @@ const formatTodayDate = () => {
   return formattedDate;
 };
 
-// Fungsi untuk memformat waktu saat ini
 const formatCurrentTime = () => {
   const now = new Date();
-  // Format waktu menjadi "09:22"
   const formattedTime = now.toLocaleTimeString("id-ID", {
     hour: "2-digit",
     minute: "2-digit",
@@ -37,12 +34,11 @@ const formatCurrentTime = () => {
 export default function HomeScreen() {
   const navigation = useNavigation();
 
-  // State untuk menyimpan data pengguna dan status loading
   const [userData, setUserData] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [currentTime, setCurrentTime] = useState(formatCurrentTime());
 
   useEffect(() => {
-    // Fungsi untuk mengambil data pengguna dari API
     const fetchUserData = async () => {
       try {
         const token = await getValueFor("token");
@@ -67,8 +63,15 @@ export default function HomeScreen() {
       }
     };
 
-    // Panggil fungsi fetchUserData
     fetchUserData();
+
+    // Setup interval untuk memperbarui waktu setiap menit
+    const intervalId = setInterval(() => {
+      setCurrentTime(formatCurrentTime());
+    }, 30000);
+
+    // Bersihkan interval setelah komponen tidak lagi digunakan
+    return () => clearInterval(intervalId);
   }, []);
 
   if (loading) {
@@ -88,7 +91,6 @@ export default function HomeScreen() {
   }
 
   const currentDate = formatTodayDate();
-  const currentTime = formatCurrentTime();
 
   return (
     <View style={styles.container}>
