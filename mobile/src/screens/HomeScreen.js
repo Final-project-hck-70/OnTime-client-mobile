@@ -65,12 +65,10 @@ export default function HomeScreen() {
 
     fetchUserData();
 
-    // Setup interval untuk memperbarui waktu setiap menit
     const intervalId = setInterval(() => {
       setCurrentTime(formatCurrentTime());
     }, 30000);
 
-    // Bersihkan interval setelah komponen tidak lagi digunakan
     return () => clearInterval(intervalId);
   }, []);
 
