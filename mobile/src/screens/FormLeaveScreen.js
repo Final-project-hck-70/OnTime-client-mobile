@@ -1,14 +1,15 @@
+import React, { useState, useEffect } from "react";
 import {
-  Alert,
-  StyleSheet,
-  Text,
-  TextInput,
-  TouchableOpacity,
   View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  TextInput,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import DateTimePicker from "@react-native-community/datetimepicker";
-import { useState, useEffect } from "react";
+import { Picker } from "@react-native-picker/picker";
 import { getValueFor } from "../helpers/secureStore";
 
 export default function FormLeaveScreen({ navigation }) {
@@ -19,30 +20,33 @@ export default function FormLeaveScreen({ navigation }) {
   const [mode, setMode] = useState("date");
   const [fromDateText, setFromDateText] = useState("From");
   const [toDateText, setToDateText] = useState("To");
-  const [delegateTo, setDelegateTo] = useState("");
   const [leaveReason, setLeaveReason] = useState("");
   const [userList, setUserList] = useState([]);
+  const [selectedUser, setSelectedUser] = useState("");
 
   useEffect(() => {
     const fetchUsers = async () => {
       try {
         const token = await getValueFor("token");
         if (!token) {
-          Alert.alert("Error, User not authenticated");
+          Alert.alert("Error", "User not authenticated");
           return;
         }
         const response = await fetch(
-          "https://a154-36-70-217-215.ngrok-free.app/users",
+          "https://7210-36-70-217-215.ngrok-free.app/users",
           {
             headers: {
               Authorization: `Bearer ${token}`,
             },
           }
         );
+        if (!response.ok) {
+          throw new Error("Failed to fetch user list");
+        }
         const data = await response.json();
         setUserList(data);
       } catch (error) {
-        console.log("Error fetching user list", error);
+        console.error("Error fetching user list:", error);
         Alert.alert("Error", "Failed to fetch user list");
       }
     };
@@ -89,11 +93,11 @@ export default function FormLeaveScreen({ navigation }) {
     try {
       const token = await getValueFor("token");
       if (!token) {
-        Alert.alert("Error, User not authenticated");
+        Alert.alert("Error", "User not authenticated");
         return;
       }
 
-      const delegateUser = userList.find((user) => user.name === delegateTo);
+      const delegateUser = userList.find((user) => user.name === selectedUser);
       const DelegateUserId = delegateUser ? delegateUser.id : null;
 
       if (!DelegateUserId) {
@@ -119,19 +123,13 @@ export default function FormLeaveScreen({ navigation }) {
       );
 
       const data = await response.json();
-
+      navigation.navigate("LeaveSubmission");
       if (response.status === 201) {
-        Alert.alert("Success", "Leave submission created successfully", [
-          {
-            text: "OK",
-            onPress: () => navigation.navigate("LeaveSubmission"),
-          },
-        ]);
       } else {
         Alert.alert("Error", data.message || "Something went wrong");
       }
     } catch (error) {
-      console.log("Error", error);
+      console.error("Error", error);
       Alert.alert("Error", "Something went wrong");
     }
   };
@@ -191,13 +189,16 @@ export default function FormLeaveScreen({ navigation }) {
       )}
       <View style={styles.inputBox}>
         <View style={styles.inputContainer}>
-          <TextInput
+          <Picker
+            selectedValue={selectedUser}
+            onValueChange={(itemValue, itemIndex) => setSelectedUser(itemValue)}
             style={styles.input}
-            placeholder="Delegate To"
-            placeholderTextColor="white"
-            value={delegateTo}
-            onChangeText={setDelegateTo}
-          />
+          >
+            <Picker.Item label="Select Delegate" value="" />
+            {userList.map((user) => (
+              <Picker.Item key={user.id} label={user.name} value={user.name} />
+            ))}
+          </Picker>
         </View>
       </View>
       <View style={styles.inputBox}>

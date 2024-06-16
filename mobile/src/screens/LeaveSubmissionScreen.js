@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from "react";
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from "react-native";
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  Alert,
+  ScrollView,
+} from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { getValueFor } from "../helpers/secureStore";
@@ -10,40 +17,72 @@ const LeaveSubmissionScreen = () => {
   const [remainingLeaves, setRemainingLeaves] = useState();
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const fetchLeaveData = async () => {
-      try {
-        const token = await getValueFor("token");
-        if (!token) {
-          Alert.alert("Error", "User not authenticated");
-          return;
-        }
-
-        const response = await fetch(
-          "https://7210-36-70-217-215.ngrok-free.app/users/profile/me",
-          {
-            headers: {
-              Authorization: `Bearer ${token}`,
-            },
-          }
-        );
-        if (!response.ok) {
-          throw new Error("Failed to fetch leave data");
-        }
-        const data = await response.json();
-        const remaining = data.Company.totalLeaves - data.Leaves.length;
-        setRemainingLeaves(remaining);
-        setLeaveData(data.Leaves);
-      } catch (error) {
-        console.error("Error fetching leave data:", error);
-        Alert.alert("Error", "Failed to load leave data");
-      } finally {
-        setLoading(false);
+  const fetchLeaveData = async () => {
+    try {
+      const token = await getValueFor("token");
+      if (!token) {
+        Alert.alert("Error", "User not authenticated");
+        return;
       }
-    };
 
+      const response = await fetch(
+        "https://7210-36-70-217-215.ngrok-free.app/users/profile/me",
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+      if (!response.ok) {
+        throw new Error("Failed to fetch leave data");
+      }
+      const data = await response.json();
+
+      // Filter approved leaves
+      const approvedLeaves = data.Leaves.filter(
+        (leave) => leave.leaveStatus === "Approved"
+      );
+
+      // Calculate total days from approved leaves
+      const totalApprovedDays = approvedLeaves.reduce((acc, leave) => {
+        const start = new Date(leave.from);
+        const end = new Date(leave.to);
+        const diffTime = Math.abs(end - start);
+        const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+        return acc + diffDays;
+      }, 0);
+
+      // Calculate remaining leaves
+      const remaining = data.Company.totalLeaves - totalApprovedDays;
+      setRemainingLeaves(remaining);
+      setLeaveData(data.Leaves); // Set semua data cuti
+    } catch (error) {
+      console.error("Error fetching leave data:", error);
+      Alert.alert("Error", "Failed to load leave data");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const unsubscribe = navigation.addListener("focus", () => {
+      fetchLeaveData();
+    });
+
+    return unsubscribe;
+  }, [navigation]);
+
+  useEffect(() => {
     fetchLeaveData();
   }, []);
+
+  const handleAddLeave = () => {
+    if (remainingLeaves <= 0) {
+      Alert.alert("Error", "No remaining leave available");
+    } else {
+      navigation.navigate("FormLeave");
+    }
+  };
 
   if (loading) {
     return (
@@ -79,31 +118,34 @@ const LeaveSubmissionScreen = () => {
       </View>
       <View style={styles.buttonPlace}>
         <TouchableOpacity
-          onPress={() => navigation.navigate("FormLeave")}
+          onPress={handleAddLeave}
           style={styles.button}
           activeOpacity={0.6}
+          disabled={remainingLeaves <= 0}
         >
           <Text style={styles.buttonText}>Add Leave</Text>
         </TouchableOpacity>
       </View>
-      {leaveData.map((leave, index) => (
-        <View key={index} style={styles.infoCard}>
-          <View style={styles.infoCardContent}>
-            <Text style={styles.infoCardText}>
-              Reason Leave: {leave.reason}
-            </Text>
-            <Text style={styles.infoCardText}>
-              From: {new Date(leave.from).toLocaleDateString()}
-            </Text>
-            <Text style={styles.infoCardText}>
-              To: {new Date(leave.to).toLocaleDateString()}
-            </Text>
-            <Text style={styles.infoCardText}>
-              Leave Status: {leave.leaveStatus}
-            </Text>
+      <ScrollView style={{ flex: 1 }}>
+        {leaveData.map((leave, index) => (
+          <View key={index} style={styles.infoCard}>
+            <View style={styles.infoCardContent}>
+              <Text style={styles.infoCardText}>
+                Reason Leave: {leave.reason}
+              </Text>
+              <Text style={styles.infoCardText}>
+                From: {new Date(leave.from).toLocaleDateString()}
+              </Text>
+              <Text style={styles.infoCardText}>
+                To: {new Date(leave.to).toLocaleDateString()}
+              </Text>
+              <Text style={styles.infoCardText}>
+                Leave Status: {leave.leaveStatus}
+              </Text>
+            </View>
           </View>
-        </View>
-      ))}
+        ))}
+      </ScrollView>
     </View>
   );
 };
