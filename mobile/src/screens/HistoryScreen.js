@@ -10,6 +10,7 @@ export default function HistoryScreen() {
     const [attendanceData, setAttendanceData] = useState([])
     const [filteredAttendanceData, setFilteredAttendanceData] = useState([])
     const [lateCount, setLateCount] = useState(0)
+    const [absentCount, setAbsentCount] = useState(0)
 
     const fetchUserData = async () => {
         try {
@@ -20,7 +21,7 @@ export default function HistoryScreen() {
             }
 
             const response = await fetch(
-                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/users/profile/me',
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/users/profile/me',
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -49,6 +50,15 @@ export default function HistoryScreen() {
         filterAttendanceData()
     }, [selectedMonth, selectedYear, attendanceData])
 
+    const getDaysInMonth = (month, year) => {
+        return new Date(year, month, 0).getDate()
+    }
+
+    const isWeekend = (date) => {
+        const day = date.getDay()
+        return day === 0 || day === 6
+    }
+
     const filterAttendanceData = () => {
         const monthNames = [
             'January',
@@ -67,6 +77,9 @@ export default function HistoryScreen() {
 
         const monthIndex = monthNames.indexOf(selectedMonth) + 1
         let lateCountTemp = 0
+        let absentCountTemp = 0
+        const daysInMonth = getDaysInMonth(monthIndex, selectedYear)
+
         const filteredData = attendanceData.filter((attendance) => {
             const attendanceDate = new Date(attendance.createdAt)
             const attendanceMonth = attendanceDate.getMonth() + 1
@@ -83,7 +96,19 @@ export default function HistoryScreen() {
             return isMatching
         })
 
+        const attendanceDates = filteredData.map((attendance) =>
+            new Date(attendance.createdAt).getDate()
+        )
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(selectedYear, monthIndex - 1, day)
+            if (!isWeekend(date) && !attendanceDates.includes(day)) {
+                absentCountTemp += 1
+            }
+        }
+
         setLateCount(lateCountTemp)
+        setAbsentCount(absentCountTemp)
         setFilteredAttendanceData(filteredData)
     }
 
@@ -99,7 +124,9 @@ export default function HistoryScreen() {
                         <Text style={styles.infoCardTextHeader}>
                             Late Clock In: {lateCount}
                         </Text>
-                        <Text style={styles.infoCardTextHeader}>Absent:</Text>
+                        <Text style={styles.infoCardTextHeader}>
+                            Absent Total: {absentCount}
+                        </Text>
                     </View>
                 </View>
             </View>

@@ -32,7 +32,7 @@ export default function FormLeaveScreen({ navigation }) {
                     return
                 }
                 const response = await fetch(
-                    'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/users',
+                    'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/users',
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -104,7 +104,7 @@ export default function FormLeaveScreen({ navigation }) {
             }
 
             const response = await fetch(
-                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/leaves',
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/leaves',
                 {
                     method: 'POST',
                     headers: {

@@ -21,7 +21,7 @@ export default function LoginScreen() {
     const handleLogin = async () => {
         try {
             const response = await fetch(
-                'https://452f-2405-8180-403-db32-cc1b-14ed-b012-2e5c.ngrok-free.app/login',
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/login',
                 {
                     method: 'POST',
                     headers: {
