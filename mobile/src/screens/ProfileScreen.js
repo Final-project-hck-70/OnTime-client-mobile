@@ -1,3 +1,4 @@
+import React, { useContext, useEffect, useState } from 'react'
 import {
     Image,
     SafeAreaView,
@@ -5,6 +6,7 @@ import {
     Text,
     TouchableOpacity,
     View,
+    Alert,
 } from 'react-native'
 import {
     Ionicons,
@@ -12,12 +14,12 @@ import {
     FontAwesome,
     MaterialCommunityIcons,
 } from '@expo/vector-icons'
-import { useContext, useEffect } from 'react'
 import { AuthContext } from '../config/authContext'
-import { deleteKey } from '../helpers/secureStore'
+import { deleteKey, getValueFor } from '../helpers/secureStore'
 
 export default function ProfileScreen() {
-    const { setIsSignedIn, isSignedIn } = useContext(AuthContext)
+    const { setIsSignedIn } = useContext(AuthContext)
+    const [userData, setUserData] = useState(null)
 
     async function handleLogout() {
         try {
@@ -28,6 +30,42 @@ export default function ProfileScreen() {
         }
     }
 
+    const fetchUserData = async () => {
+        try {
+            const token = await getValueFor('token')
+            if (!token) {
+                Alert.alert('Error', 'User not authenticated')
+                return
+            }
+
+            const response = await fetch(
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/users/profile/me',
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
+            const data = await response.json()
+
+            if (response.status === 200) {
+                setUserData(data)
+            } else {
+                Alert.alert('Error', data.message || 'Something went wrong')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            Alert.alert('Error', 'Something went wrong')
+        }
+    }
+
+    useEffect(() => {
+        fetchUserData()
+    }, [])
+
     return (
         <View style={styles.container}>
             <SafeAreaView style={styles.safeArea}>
@@ -35,13 +73,17 @@ export default function ProfileScreen() {
                     <View style={styles.propicArea}>
                         <Image
                             source={{
-                                uri: 'https://res.cloudinary.com/dzbexi0ka/image/upload/v1717160394/linkedin-app/zkcqrhodmukgin2okweo.jpg',
+                                uri:
+                                    userData?.avaUrl ||
+                                    'default-image-url-here',
                             }}
                             style={styles.propic}
                         />
                     </View>
-                    <Text style={styles.name}>Jhon Benedict</Text>
-                    <Text style={styles.membership}>Manager</Text>
+                    <Text style={styles.name}>{userData?.name || 'Name'}</Text>
+                    <Text style={styles.membership}>
+                        {userData?.role || 'Role'}
+                    </Text>
                 </View>
 
                 <View style={styles.buttonList}>
@@ -56,7 +98,9 @@ export default function ProfileScreen() {
                                 marginLeft={40}
                                 color="white"
                             />
-                            <Text style={styles.buttonName}>Hacktiv8</Text>
+                            <Text style={styles.buttonName}>
+                                {userData?.Company?.name || 'Company'}
+                            </Text>
                         </View>
                         <View style={styles.sp}></View>
                     </TouchableOpacity>
@@ -72,7 +116,9 @@ export default function ProfileScreen() {
                                 marginLeft={40}
                                 color="white"
                             />
-                            <Text style={styles.buttonName}>jhon@mail.com</Text>
+                            <Text style={styles.buttonName}>
+                                {userData?.email || 'Email'}
+                            </Text>
                         </View>
                         <View style={styles.sp}></View>
                     </TouchableOpacity>
@@ -88,7 +134,9 @@ export default function ProfileScreen() {
                                 marginLeft={35}
                                 color="white"
                             />
-                            <Text style={styles.buttonName}>083213839213</Text>
+                            <Text style={styles.buttonName}>
+                                {userData?.phoneNumber || 'Phone'}
+                            </Text>
                         </View>
                         <View style={styles.sp}></View>
                     </TouchableOpacity>
