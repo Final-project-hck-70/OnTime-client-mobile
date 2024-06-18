@@ -50,37 +50,49 @@ export default function FormOvertimeScreen({ navigation }) {
         return;
       }
 
-      const response = await fetch(
-        "https://7210-36-70-217-215.ngrok-free.app/overtimes",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            overtimeDate: date.toISOString().split("T")[0],
-            overtimeDuration,
-            overtimeReason,
-          }),
-        }
-      );
+
+            const response = await fetch(
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/overtimes',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        overtimeDate: date.toISOString().split('T')[0],
+                        overtimeDuration,
+                        overtimeReason,
+                    }),
+                }
+            )
+
 
       const data = await response.json();
 
-      if (response.status === 201) {
-        Alert.alert("Success", "Overtime submisssion created successfully", [
-          {
-            text: "OK",
-            onPress: () => navigation.navigate("OvertimeSubmission"),
-          },
-        ]);
-      } else {
-        Alert.alert("Error", data.message || "Something went wrong");
-      }
-    } catch (error) {
-      console.error("Error:", error);
-      Alert.alert("Error", "Something went wrong");
+
+            if (response.status === 201) {
+                Alert.alert(
+                    'Success',
+                    'Overtime submisssion created successfully',
+                    [
+                        {
+                            text: 'OK',
+                            onPress: () =>
+                                navigation.navigate('OvertimeSubmission', {
+                                    refresh: true,
+                                }),
+                        },
+                    ]
+                )
+            } else {
+                Alert.alert('Error', data.message || 'Something went wrong')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            Alert.alert('Error', 'Something went wrong')
+        }
+
     }
   };
 

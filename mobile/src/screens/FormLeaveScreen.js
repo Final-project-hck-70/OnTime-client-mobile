@@ -31,6 +31,7 @@ export default function FormLeaveScreen({ navigation }) {
         if (!token) {
           Alert.alert("Error", "User not authenticated");
           return;
+
         }
         const response = await fetch(
           "https://7210-36-70-217-215.ngrok-free.app/users",
@@ -119,6 +120,7 @@ export default function FormLeaveScreen({ navigation }) {
             reason: leaveReason,
             DelegateUserId,
           }),
+
         }
       );
 

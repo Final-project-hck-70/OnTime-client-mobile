@@ -18,18 +18,19 @@ export default function LoginScreen() {
   const [password, setPassword] = useState("");
   const { setIsSignedIn } = useContext(AuthContext);
 
-  const handleLogin = async () => {
-    try {
-      const response = await fetch(
-        "https://7210-36-70-217-215.ngrok-free.app/login",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email, password }),
-        }
-      );
+
+    const handleLogin = async () => {
+        try {
+            const response = await fetch(
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/login',
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                }
+            )
 
       const data = await response.json();
 

@@ -1,7 +1,75 @@
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import {
+    StyleSheet,
+    Text,
+    TouchableOpacity,
+    View,
+    FlatList,
+    Alert,
+} from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
+import CardOvertime from '../components/CardOvertime'
+import { getValueFor } from '../helpers/secureStore'
 
 export default function OvertimeSubmissionScreen({ navigation }) {
+    const [overtimeData, setOvertimeData] = useState([])
+
+    const fetchOvertimeData = async () => {
+        try {
+            const token = await getValueFor('token')
+            if (!token) {
+                Alert.alert('Error', 'User not authenticated')
+                return
+            }
+
+            const responseUser = await fetch(
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/users/profile/me',
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
+            const dataUser = await responseUser.json()
+
+            const response = await fetch(
+                `https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/overtimes/user/${dataUser.Attendances[0].UserId}`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
+            const data = await response.json()
+
+            if (response.status === 200) {
+                setOvertimeData(data)
+            } else {
+                Alert.alert('Error', data.message || 'Something went wrong')
+            }
+        } catch (error) {
+            console.error('Error:', error)
+            Alert.alert('Error', 'Something went wrong')
+        }
+    }
+
+    useEffect(() => {
+        fetchOvertimeData()
+    }, [])
+
+    useEffect(() => {
+        const unsubscribe = navigation.addListener('focus', () => {
+            fetchOvertimeData()
+        })
+        return unsubscribe
+    }, [navigation])
+
     return (
         <View style={styles.container}>
             <View style={styles.header}>
@@ -30,20 +98,11 @@ export default function OvertimeSubmissionScreen({ navigation }) {
                     <Text style={styles.buttonText}>Add Overtime</Text>
                 </TouchableOpacity>
             </View>
-            <View style={styles.infoCard}>
-                <View style={styles.infoCardContent}>
-                    <Text style={styles.infoCardText}>Reason Overtime:</Text>
-                    <Text style={styles.infoCardText}>Duration Overtime:</Text>
-                    <Text style={styles.infoCardText}>Overtime Status:</Text>
-                </View>
-            </View>
-            <View style={styles.infoCard}>
-                <View style={styles.infoCardContent}>
-                    <Text style={styles.infoCardText}>Reason Overtime:</Text>
-                    <Text style={styles.infoCardText}>Duration Overtime:</Text>
-                    <Text style={styles.infoCardText}>Overtime Status:</Text>
-                </View>
-            </View>
+            <FlatList
+                data={overtimeData}
+                keyExtractor={(item) => item.id.toString()}
+                renderItem={({ item }) => <CardOvertime overtime={item} />}
+            />
         </View>
     )
 }
@@ -75,26 +134,6 @@ const styles = StyleSheet.create({
         fontWeight: '900',
         textAlign: 'center',
     },
-    infoCardHeader: {
-        width: '90%',
-        height: 41,
-        marginTop: 20,
-        backgroundColor: '#f2f2f2',
-        alignSelf: 'center',
-        borderRadius: 20,
-        marginBottom: 30,
-    },
-    infoCardContentHeader: {
-        width: '90%',
-        marginTop: 10,
-        justifyContent: 'space-between',
-        marginLeft: 20,
-    },
-    infoCardTextHeader: {
-        fontSize: 15,
-        fontWeight: '600',
-        textAlign: 'center',
-    },
     buttonPlace: {
         alignItems: 'center',
         marginTop: 20,
@@ -114,25 +153,5 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         color: 'black',
         textAlign: 'center',
-    },
-    infoCard: {
-        width: '93%',
-        height: 114,
-        marginTop: 10,
-        backgroundColor: 'black',
-        alignSelf: 'center',
-        borderRadius: 20,
-    },
-    infoCardContent: {
-        width: '90%',
-        marginTop: 20,
-        gap: 5,
-        justifyContent: 'space-between',
-        marginLeft: 20,
-    },
-    infoCardText: {
-        fontSize: 15,
-        fontWeight: '600',
-        color: 'white',
     },
 })

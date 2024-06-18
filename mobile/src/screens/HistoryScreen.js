@@ -5,11 +5,13 @@ import { getValueFor } from "../helpers/secureStore";
 import CardAttendance from "../components/CardAttendance";
 
 export default function HistoryScreen() {
-  const [selectedMonth, setSelectedMonth] = useState("");
-  const [selectedYear, setSelectedYear] = useState("");
-  const [attendanceData, setAttendanceData] = useState([]);
-  const [filteredAttendanceData, setFilteredAttendanceData] = useState([]);
-  const [lateCount, setLateCount] = useState(0);
+
+    const [selectedMonth, setSelectedMonth] = useState('')
+    const [selectedYear, setSelectedYear] = useState('')
+    const [attendanceData, setAttendanceData] = useState([])
+    const [filteredAttendanceData, setFilteredAttendanceData] = useState([])
+    const [lateCount, setLateCount] = useState(0)
+    const [absentCount, setAbsentCount] = useState(0)
 
   const fetchUserData = async () => {
     try {
@@ -19,14 +21,15 @@ export default function HistoryScreen() {
         return;
       }
 
-      const response = await fetch(
-        "https://7210-36-70-217-215.ngrok-free.app/users/profile/me",
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
+            const response = await fetch(
+                'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/users/profile/me',
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
+
 
       const data = await response.json();
 
@@ -49,31 +52,45 @@ export default function HistoryScreen() {
     filterAttendanceData();
   }, [selectedMonth, selectedYear, attendanceData]);
 
-  const filterAttendanceData = () => {
-    const monthNames = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
 
-    const monthIndex = monthNames.indexOf(selectedMonth) + 1;
-    let lateCountTemp = 0;
-    const filteredData = attendanceData.filter((attendance) => {
-      const attendanceDate = new Date(attendance.createdAt);
-      const attendanceMonth = attendanceDate.getMonth() + 1;
-      const attendanceYear = attendanceDate.getFullYear();
-      const isMatching =
-        (selectedMonth === "" || attendanceMonth === monthIndex) &&
-        (selectedYear === "" || attendanceYear === parseInt(selectedYear));
+    const getDaysInMonth = (month, year) => {
+        return new Date(year, month, 0).getDate()
+    }
+
+    const isWeekend = (date) => {
+        const day = date.getDay()
+        return day === 0 || day === 6
+    }
+
+    const filterAttendanceData = () => {
+        const monthNames = [
+            'January',
+            'February',
+            'March',
+            'April',
+            'May',
+            'June',
+            'July',
+            'August',
+            'September',
+            'October',
+            'November',
+            'December',
+        ]
+
+        const monthIndex = monthNames.indexOf(selectedMonth) + 1
+        let lateCountTemp = 0
+        let absentCountTemp = 0
+        const daysInMonth = getDaysInMonth(monthIndex, selectedYear)
+
+        const filteredData = attendanceData.filter((attendance) => {
+            const attendanceDate = new Date(attendance.createdAt)
+            const attendanceMonth = attendanceDate.getMonth() + 1
+            const attendanceYear = attendanceDate.getFullYear()
+            const isMatching =
+                (selectedMonth === '' || attendanceMonth === monthIndex) &&
+                (selectedYear === '' ||
+                    attendanceYear === parseInt(selectedYear))
 
       if (isMatching && attendance.attendanceStatus === "late") {
         lateCountTemp += 1;
@@ -82,65 +99,95 @@ export default function HistoryScreen() {
       return isMatching;
     });
 
-    setLateCount(lateCountTemp);
-    setFilteredAttendanceData(filteredData);
-  };
 
-  return (
-    <View style={styles.container}>
-      <View style={styles.header}></View>
-      <View style={styles.absoluteContainer}>
-        <View style={styles.titleContainer}>
-          <Text style={styles.title}>History</Text>
-        </View>
-        <View style={styles.infoCardHeader}>
-          <View style={styles.infoCardContentHeader}>
-            <Text style={styles.infoCardTextHeader}>
-              Late Clock In: {lateCount}
-            </Text>
-            <Text style={styles.infoCardTextHeader}>Absent:</Text>
-          </View>
-        </View>
-      </View>
-      <View style={styles.pickerContainer}>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={selectedMonth}
-            style={styles.picker}
-            onValueChange={(itemValue) => setSelectedMonth(itemValue)}
-            mode="dropdown"
-            dropdownIconColor="black"
-          >
-            <Picker.Item label="Month" value="" />
-            <Picker.Item label="January" value="January" />
-            <Picker.Item label="February" value="February" />
-            <Picker.Item label="March" value="March" />
-            <Picker.Item label="April" value="April" />
-            <Picker.Item label="May" value="May" />
-            <Picker.Item label="June" value="June" />
-            <Picker.Item label="July" value="July" />
-            <Picker.Item label="August" value="August" />
-            <Picker.Item label="September" value="September" />
-            <Picker.Item label="October" value="October" />
-            <Picker.Item label="November" value="November" />
-            <Picker.Item label="December" value="December" />
-          </Picker>
-        </View>
-        <View style={styles.pickerWrapper}>
-          <Picker
-            selectedValue={selectedYear}
-            style={styles.picker}
-            onValueChange={(itemValue) => setSelectedYear(itemValue)}
-            mode="dropdown"
-            dropdownIconColor="black"
-          >
-            <Picker.Item label="Year" value="" />
-            <Picker.Item label="2020" value="2020" />
-            <Picker.Item label="2021" value="2021" />
-            <Picker.Item label="2022" value="2022" />
-            <Picker.Item label="2023" value="2023" />
-            <Picker.Item label="2024" value="2024" />
-          </Picker>
+        const attendanceDates = filteredData.map((attendance) =>
+            new Date(attendance.createdAt).getDate()
+        )
+
+        for (let day = 1; day <= daysInMonth; day++) {
+            const date = new Date(selectedYear, monthIndex - 1, day)
+            if (!isWeekend(date) && !attendanceDates.includes(day)) {
+                absentCountTemp += 1
+            }
+        }
+
+        setLateCount(lateCountTemp)
+        setAbsentCount(absentCountTemp)
+        setFilteredAttendanceData(filteredData)
+    }
+
+    return (
+        <View style={styles.container}>
+            <View style={styles.header}></View>
+            <View style={styles.absoluteContainer}>
+                <View style={styles.titleContainer}>
+                    <Text style={styles.title}>History</Text>
+                </View>
+                <View style={styles.infoCardHeader}>
+                    <View style={styles.infoCardContentHeader}>
+                        <Text style={styles.infoCardTextHeader}>
+                            Late Clock In: {lateCount}
+                        </Text>
+                        <Text style={styles.infoCardTextHeader}>
+                            Absent Total: {absentCount}
+                        </Text>
+                    </View>
+                </View>
+            </View>
+            <View style={styles.pickerContainer}>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={selectedMonth}
+                        style={styles.picker}
+                        onValueChange={(itemValue) =>
+                            setSelectedMonth(itemValue)
+                        }
+                        mode="dropdown"
+                        dropdownIconColor="black"
+                    >
+                        <Picker.Item label="Month" value="" />
+                        <Picker.Item label="January" value="January" />
+                        <Picker.Item label="February" value="February" />
+                        <Picker.Item label="March" value="March" />
+                        <Picker.Item label="April" value="April" />
+                        <Picker.Item label="May" value="May" />
+                        <Picker.Item label="June" value="June" />
+                        <Picker.Item label="July" value="July" />
+                        <Picker.Item label="August" value="August" />
+                        <Picker.Item label="September" value="September" />
+                        <Picker.Item label="October" value="October" />
+                        <Picker.Item label="November" value="November" />
+                        <Picker.Item label="December" value="December" />
+                    </Picker>
+                </View>
+                <View style={styles.pickerWrapper}>
+                    <Picker
+                        selectedValue={selectedYear}
+                        style={styles.picker}
+                        onValueChange={(itemValue) =>
+                            setSelectedYear(itemValue)
+                        }
+                        mode="dropdown"
+                        dropdownIconColor="black"
+                    >
+                        <Picker.Item label="Year" value="" />
+                        <Picker.Item label="2020" value="2020" />
+                        <Picker.Item label="2021" value="2021" />
+                        <Picker.Item label="2022" value="2022" />
+                        <Picker.Item label="2023" value="2023" />
+                        <Picker.Item label="2024" value="2024" />
+                    </Picker>
+                </View>
+            </View>
+            <Text style={styles.textList}>List History of Attendance</Text>
+            <ScrollView>
+                {filteredAttendanceData.map((attendance) => (
+                    <CardAttendance
+                        key={attendance.id}
+                        attendance={attendance}
+                    />
+                ))}
+            </ScrollView>
         </View>
       </View>
       <Text style={styles.textList}>List History of Attendance</Text>
