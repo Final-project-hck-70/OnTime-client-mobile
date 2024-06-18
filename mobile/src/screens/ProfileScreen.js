@@ -82,7 +82,7 @@ export default function ProfileScreen() {
                     </View>
                     <Text style={styles.name}>{userData?.name || 'Name'}</Text>
                     <Text style={styles.membership}>
-                        {userData?.role || 'Role'}
+                        {userData?.position || 'Position'}
                     </Text>
                 </View>
 

@@ -1,11 +1,10 @@
-import React, { useState, useEffect } from "react";
-import { View, Text, StyleSheet, ScrollView, Alert } from "react-native";
-import { Picker } from "@react-native-picker/picker";
-import { getValueFor } from "../helpers/secureStore";
-import CardAttendance from "../components/CardAttendance";
+import React, { useState, useEffect } from 'react'
+import { View, Text, StyleSheet, ScrollView, Alert } from 'react-native'
+import { Picker } from '@react-native-picker/picker'
+import { getValueFor } from '../helpers/secureStore'
+import CardAttendance from '../components/CardAttendance'
 
 export default function HistoryScreen() {
-
     const [selectedMonth, setSelectedMonth] = useState('')
     const [selectedYear, setSelectedYear] = useState('')
     const [attendanceData, setAttendanceData] = useState([])
@@ -13,13 +12,13 @@ export default function HistoryScreen() {
     const [lateCount, setLateCount] = useState(0)
     const [absentCount, setAbsentCount] = useState(0)
 
-  const fetchUserData = async () => {
-    try {
-      const token = await getValueFor("token");
-      if (!token) {
-        Alert.alert("Error", "User not authenticated");
-        return;
-      }
+    const fetchUserData = async () => {
+        try {
+            const token = await getValueFor('token')
+            if (!token) {
+                Alert.alert('Error', 'User not authenticated')
+                return
+            }
 
             const response = await fetch(
                 'https://088f-2405-8180-403-db32-9cb0-2322-6dec-462.ngrok-free.app/users/profile/me',
@@ -30,28 +29,26 @@ export default function HistoryScreen() {
                 }
             )
 
+            const data = await response.json()
 
-      const data = await response.json();
+            if (response.status !== 200) {
+                throw new Error(data.message || 'Failed to fetch user data')
+            }
 
-      if (response.status !== 200) {
-        throw new Error(data.message || "Failed to fetch user data");
-      }
-
-      setAttendanceData(data.Attendances || []);
-    } catch (error) {
-      console.log("Error fetching user data", error);
-      Alert.alert("Error", "Failed to fetch user data");
+            setAttendanceData(data.Attendances || [])
+        } catch (error) {
+            console.log('Error fetching user data', error)
+            Alert.alert('Error', 'Failed to fetch user data')
+        }
     }
-  };
 
-  useEffect(() => {
-    fetchUserData();
-  }, []);
+    useEffect(() => {
+        fetchUserData()
+    }, [])
 
-  useEffect(() => {
-    filterAttendanceData();
-  }, [selectedMonth, selectedYear, attendanceData]);
-
+    useEffect(() => {
+        filterAttendanceData()
+    }, [selectedMonth, selectedYear, attendanceData])
 
     const getDaysInMonth = (month, year) => {
         return new Date(year, month, 0).getDate()
@@ -92,13 +89,12 @@ export default function HistoryScreen() {
                 (selectedYear === '' ||
                     attendanceYear === parseInt(selectedYear))
 
-      if (isMatching && attendance.attendanceStatus === "late") {
-        lateCountTemp += 1;
-      }
+            if (isMatching && attendance.attendanceStatus === 'late') {
+                lateCountTemp += 1
+            }
 
-      return isMatching;
-    });
-
+            return isMatching
+        })
 
         const attendanceDates = filteredData.map((attendance) =>
             new Date(attendance.createdAt).getDate()
@@ -189,86 +185,78 @@ export default function HistoryScreen() {
                 ))}
             </ScrollView>
         </View>
-      </View>
-      <Text style={styles.textList}>List History of Attendance</Text>
-      <ScrollView>
-        {filteredAttendanceData.map((attendance) => (
-          <CardAttendance key={attendance.id} attendance={attendance} />
-        ))}
-      </ScrollView>
-    </View>
-  );
+    )
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  header: {
-    width: "100%",
-    height: 205,
-    backgroundColor: "red",
-    borderBottomLeftRadius: 30,
-    borderBottomRightRadius: 30,
-  },
-  absoluteContainer: {
-    width: "100%",
-    height: "100%",
-    position: "absolute",
-  },
-  titleContainer: {
-    width: "90%",
-    alignSelf: "center",
-    marginTop: 70,
-  },
-  title: {
-    color: "white",
-    fontSize: 25,
-    fontWeight: "900",
-    textAlign: "center",
-  },
-  infoCardHeader: {
-    width: "90%",
-    height: 65,
-    marginTop: 20,
-    backgroundColor: "#f2f2f2",
-    alignSelf: "center",
-    borderRadius: 20,
-    marginBottom: 30,
-  },
-  infoCardContentHeader: {
-    width: "90%",
-    marginTop: 10,
-    justifyContent: "space-between",
-    marginLeft: 20,
-  },
-  infoCardTextHeader: {
-    fontSize: 15,
-    fontWeight: "600",
-  },
-  pickerContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    paddingHorizontal: 20,
-    marginTop: 10,
-  },
-  pickerWrapper: {
-    flexDirection: "row",
-    alignItems: "center",
-    borderWidth: 1,
-    borderColor: "gray",
-    borderRadius: 10,
-    width: "45%",
-  },
-  picker: {
-    flex: 1,
-  },
-  textList: {
-    fontWeight: "600",
-    fontSize: 18,
-    justifyContent: "center",
-    alignSelf: "center",
-    marginTop: 20,
-    marginBottom: 10,
-  },
-});
+    container: {
+        flex: 1,
+    },
+    header: {
+        width: '100%',
+        height: 205,
+        backgroundColor: 'red',
+        borderBottomLeftRadius: 30,
+        borderBottomRightRadius: 30,
+    },
+    absoluteContainer: {
+        width: '100%',
+        height: '100%',
+        position: 'absolute',
+    },
+    titleContainer: {
+        width: '90%',
+        alignSelf: 'center',
+        marginTop: 70,
+    },
+    title: {
+        color: 'white',
+        fontSize: 25,
+        fontWeight: '900',
+        textAlign: 'center',
+    },
+    infoCardHeader: {
+        width: '90%',
+        height: 65,
+        marginTop: 20,
+        backgroundColor: '#f2f2f2',
+        alignSelf: 'center',
+        borderRadius: 20,
+        marginBottom: 30,
+    },
+    infoCardContentHeader: {
+        width: '90%',
+        marginTop: 10,
+        justifyContent: 'space-between',
+        marginLeft: 20,
+    },
+    infoCardTextHeader: {
+        fontSize: 15,
+        fontWeight: '600',
+    },
+    pickerContainer: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        paddingHorizontal: 20,
+        marginTop: 10,
+    },
+    pickerWrapper: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        borderWidth: 1,
+        borderColor: 'gray',
+        borderRadius: 10,
+        width: '45%',
+    },
+    picker: {
+        flex: 1,
+    },
+    textList: {
+        fontWeight: '600',
+        fontSize: 18,
+        justifyContent: 'center',
+        alignSelf: 'center',
+        marginTop: 20,
+        marginBottom: 10,
+    },
+})
