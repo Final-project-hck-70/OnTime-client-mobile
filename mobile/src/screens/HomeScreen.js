@@ -9,7 +9,6 @@ import {
     ActivityIndicator,
 } from 'react-native'
 import { getValueFor } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 const formatTodayDate = () => {
     const today = new Date()
@@ -47,11 +46,14 @@ export default function HomeScreen() {
                     Alert.alert('Error', 'User not authenticated')
                     return
                 }
-                const response = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
+                const response = await fetch(
+                    `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                )
                 const data = await response.json()
                 console.log(data)
                 setUserData(data)

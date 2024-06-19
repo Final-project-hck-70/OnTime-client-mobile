@@ -16,7 +16,7 @@ export default function CardOvertime({ overtime }) {
                     Reason Overtime: {overtime.overtimeReason}
                 </Text>
                 <Text style={styles.infoCardText}>
-                    Duration Overtime: {overtime.overtimeDuration} hours
+                    Duration Overtime: {overtime.overtimeDuration} minutes
                 </Text>
                 <Text style={styles.infoCardText}>
                     Overtime Status: {overtime.overtimeStatus}

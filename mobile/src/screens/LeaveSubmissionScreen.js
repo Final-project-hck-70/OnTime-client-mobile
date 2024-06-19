@@ -10,7 +10,6 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { useNavigation } from '@react-navigation/native'
 import { getValueFor } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 const LeaveSubmissionScreen = () => {
     const navigation = useNavigation()
@@ -26,11 +25,14 @@ const LeaveSubmissionScreen = () => {
                 return
             }
 
-            const response = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
             if (!response.ok) {
                 throw new Error('Failed to fetch leave data')
             }

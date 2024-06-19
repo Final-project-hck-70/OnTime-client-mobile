@@ -5,7 +5,6 @@ import * as Location from 'expo-location'
 import { useNavigation } from '@react-navigation/native'
 import { getValueFor } from '../helpers/secureStore'
 import haversine from 'haversine'
-import { PUBLIC_URI } from '@env'
 
 const ClockInScreen = () => {
     const navigation = useNavigation()
@@ -22,11 +21,14 @@ const ClockInScreen = () => {
     const fetchCompanyLocation = async () => {
         try {
             const token = await getValueFor('token')
-            const response = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
             if (!response.ok) {
                 throw new Error('Failed to fetch company location')
             }
@@ -84,14 +86,17 @@ const ClockInScreen = () => {
 
             // If distance is within threshold, proceed to clock in
             const token = await getValueFor('token')
-            const response = await fetch(`${PUBLIC_URI}/attendances`, {
-                method: 'POST',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({}),
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/attendances`,
+                {
+                    method: 'POST',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({}),
+                }
+            )
 
             if (!response.ok) {
                 throw new Error('Failed to clock in')

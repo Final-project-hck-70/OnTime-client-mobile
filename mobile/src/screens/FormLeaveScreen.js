@@ -11,7 +11,6 @@ import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { Picker } from '@react-native-picker/picker'
 import { getValueFor } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 export default function FormLeaveScreen({ navigation }) {
     const [date, setDate] = useState(new Date())
@@ -37,7 +36,7 @@ export default function FormLeaveScreen({ navigation }) {
 
                 // Fetch user profile to get CompanyId
                 const profileResponse = await fetch(
-                    `${PUBLIC_URI}/users/profile/me`,
+                    `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
                     {
                         headers: {
                             Authorization: `Bearer ${token}`,
@@ -54,11 +53,14 @@ export default function FormLeaveScreen({ navigation }) {
                 setUserCompanyId(CompanyId)
 
                 // Fetch users and filter by CompanyId
-                const response = await fetch(`${PUBLIC_URI}/users`, {
-                    headers: {
-                        Authorization: `Bearer ${token}`,
-                    },
-                })
+                const response = await fetch(
+                    `${process.env.EXPO_PUBLIC_URI}/users`,
+                    {
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                        },
+                    }
+                )
                 if (!response.ok) {
                     throw new Error('Failed to fetch user list')
                 }
@@ -132,19 +134,22 @@ export default function FormLeaveScreen({ navigation }) {
                 return
             }
 
-            const response = await fetch(`${PUBLIC_URI}/leaves`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    from: date.toISOString().split('T')[0],
-                    to: toDate.toISOString().split('T')[0],
-                    reason: leaveReason,
-                    DelegateUserId,
-                }),
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/leaves`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        from: date.toISOString().split('T')[0],
+                        to: toDate.toISOString().split('T')[0],
+                        reason: leaveReason,
+                        DelegateUserId,
+                    }),
+                }
+            )
 
             const data = await response.json()
             console.log(data)
