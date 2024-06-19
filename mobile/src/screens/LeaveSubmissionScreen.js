@@ -35,6 +35,7 @@ const LeaveSubmissionScreen = () => {
                 throw new Error('Failed to fetch leave data')
             }
             const data = await response.json()
+            console.log(data)
 
             // Filter approved leaves
             const approvedLeaves = data.Leaves.filter(

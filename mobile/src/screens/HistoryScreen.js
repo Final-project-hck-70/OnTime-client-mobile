@@ -29,6 +29,7 @@ export default function HistoryScreen() {
             })
 
             const data = await response.json()
+            console.log(data)
 
             if (response.status !== 200) {
                 throw new Error(data.message || 'Failed to fetch user data')

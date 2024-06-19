@@ -32,6 +32,7 @@ const ClockOutScreen = () => {
                 throw new Error('Failed to fetch company location')
             }
             const data = await response.json()
+            console.log(data)
             const companyLatitude = data?.Company?.latitude
             const companyLongitude = data?.Company?.longitude
             if (companyLatitude && companyLongitude) {
@@ -75,6 +76,7 @@ const ClockOutScreen = () => {
                 throw new Error('Failed to fetch attendances')
             }
             const data = await response.json()
+            console.log(data)
             if (data && data.length > 0) {
                 // Sort the attendances by createdAt in descending order and get the latest one
                 const latestAttendance = data.sort(

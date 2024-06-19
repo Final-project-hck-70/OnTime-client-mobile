@@ -48,6 +48,7 @@ export default function ProfileScreen() {
             })
 
             const data = await response.json()
+            console.log(data)
 
             if (response.status === 200) {
                 setUserData(data)

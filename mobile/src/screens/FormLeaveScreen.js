@@ -147,6 +147,7 @@ export default function FormLeaveScreen({ navigation }) {
             })
 
             const data = await response.json()
+            console.log(data)
             navigation.navigate('LeaveSubmission')
             if (response.status === 201) {
             } else {
