@@ -65,6 +65,7 @@ export default function FormOvertimeScreen({ navigation }) {
             })
 
             const data = await response.json()
+            console.log(data)
 
             if (response.status === 201) {
                 Alert.alert(

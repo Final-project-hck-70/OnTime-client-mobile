@@ -31,6 +31,7 @@ const ClockInScreen = () => {
                 throw new Error('Failed to fetch company location')
             }
             const data = await response.json()
+            console.log(data)
             const companyLatitude = data?.Company?.latitude
             const companyLongitude = data?.Company?.longitude
             if (companyLatitude && companyLongitude) {

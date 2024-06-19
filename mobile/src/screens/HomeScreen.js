@@ -53,6 +53,7 @@ export default function HomeScreen() {
                     },
                 })
                 const data = await response.json()
+                console.log(data)
                 setUserData(data)
             } catch (error) {
                 console.error('Error fetching user data:', error)
