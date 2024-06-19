@@ -10,7 +10,6 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import CardOvertime from '../components/CardOvertime'
 import { getValueFor } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 export default function OvertimeSubmissionScreen({ navigation }) {
     const [overtimeData, setOvertimeData] = useState([])
@@ -23,18 +22,21 @@ export default function OvertimeSubmissionScreen({ navigation }) {
                 return
             }
 
-            const responseUser = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const responseUser = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
 
             const dataUser = await responseUser.json()
 
             const response = await fetch(
-                `${PUBLIC_URI}/overtimes/user/${dataUser.id}`,
+                `${process.env.EXPO_PUBLIC_URI}/overtimes/user/${dataUser.id}`,
                 {
                     method: 'GET',
                     headers: {

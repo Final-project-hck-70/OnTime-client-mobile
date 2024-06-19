@@ -16,7 +16,6 @@ import {
 } from '@expo/vector-icons'
 import { AuthContext } from '../config/authContext'
 import { deleteKey, getValueFor } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 export default function ProfileScreen() {
     const { setIsSignedIn } = useContext(AuthContext)
@@ -39,13 +38,16 @@ export default function ProfileScreen() {
                 return
             }
 
-            const response = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
 
             const data = await response.json()
             console.log(data)

@@ -13,7 +13,6 @@ import { MaterialIcons, Entypo } from '@expo/vector-icons'
 import { useContext, useState } from 'react'
 import { AuthContext } from '../config/authContext'
 import { save } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('')
@@ -22,13 +21,16 @@ export default function LoginScreen() {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch(`${PUBLIC_URI}/login`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ email, password }),
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/login`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password }),
+                }
+            )
 
             const data = await response.json()
 

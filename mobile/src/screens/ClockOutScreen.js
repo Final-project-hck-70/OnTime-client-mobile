@@ -5,7 +5,6 @@ import * as Location from 'expo-location'
 import { useNavigation } from '@react-navigation/native'
 import { getValueFor } from '../helpers/secureStore'
 import haversine from 'haversine'
-import { PUBLIC_URI } from '@env'
 
 const ClockOutScreen = () => {
     const navigation = useNavigation()
@@ -23,11 +22,14 @@ const ClockOutScreen = () => {
     const fetchCompanyLocation = async () => {
         try {
             const token = await getValueFor('token')
-            const response = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
             if (!response.ok) {
                 throw new Error('Failed to fetch company location')
             }
@@ -65,7 +67,7 @@ const ClockOutScreen = () => {
             const token = await getValueFor('token')
             const userId = await getValueFor('userId')
             const response = await fetch(
-                `${PUBLIC_URI}/attendances?userId=${userId}&clockOut=null`,
+                `${process.env.EXPO_PUBLIC_URI}/attendances?userId=${userId}&clockOut=null`,
                 {
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -123,7 +125,7 @@ const ClockOutScreen = () => {
             // If distance is within threshold, proceed to clock out
             const token = await getValueFor('token')
             const response = await fetch(
-                `${PUBLIC_URI}/attendances/${attendanceId}`,
+                `${process.env.EXPO_PUBLIC_URI}/attendances/${attendanceId}`,
                 {
                     method: 'PATCH',
                     headers: {

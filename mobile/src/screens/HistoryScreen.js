@@ -4,7 +4,6 @@ import { Picker } from '@react-native-picker/picker'
 import { getValueFor } from '../helpers/secureStore'
 import CardAttendance from '../components/CardAttendance'
 import { useFocusEffect } from '@react-navigation/native'
-import { PUBLIC_URI } from '@env'
 
 export default function HistoryScreen() {
     const [selectedMonth, setSelectedMonth] = useState('')
@@ -22,11 +21,14 @@ export default function HistoryScreen() {
                 return
             }
 
-            const response = await fetch(`${PUBLIC_URI}/users/profile/me`, {
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/users/profile/me`,
+                {
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                }
+            )
 
             const data = await response.json()
             console.log(data)

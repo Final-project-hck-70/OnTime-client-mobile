@@ -10,7 +10,6 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import DateTimePicker from '@react-native-community/datetimepicker'
 import { save, getValueFor } from '../helpers/secureStore'
-import { PUBLIC_URI } from '@env'
 
 export default function FormOvertimeScreen({ navigation }) {
     const [date, setDate] = useState(new Date())
@@ -51,18 +50,21 @@ export default function FormOvertimeScreen({ navigation }) {
                 return
             }
 
-            const response = await fetch(`${PUBLIC_URI}/overtimes`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${token}`,
-                },
-                body: JSON.stringify({
-                    overtimeDate: date.toISOString().split('T')[0],
-                    overtimeDuration,
-                    overtimeReason,
-                }),
-            })
+            const response = await fetch(
+                `${process.env.EXPO_PUBLIC_URI}/overtimes`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${token}`,
+                    },
+                    body: JSON.stringify({
+                        overtimeDate: date.toISOString().split('T')[0],
+                        overtimeDuration,
+                        overtimeReason,
+                    }),
+                }
+            )
 
             const data = await response.json()
             console.log(data)
